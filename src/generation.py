@@ -30,3 +30,23 @@ def generate_page(from_path, template_path, dest_path):
 
     with open(dest_path, 'w') as to_file:
         to_file.write(full_html)
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    content_list = os.listdir(dir_path_content)
+    print(f"filename: {content_list}")
+    for item in content_list:
+        item_path = os.path.join(dir_path_content, item)
+        if os.path.isfile(item_path):
+            filename = item.split('.')[0]
+            print(f"filename: {filename}")
+            generate_page(
+                os.path.join(dir_path_content, item),
+                template_path,
+                os.path.join(dest_dir_path, f"{filename}.html")
+            )
+        else:
+            generate_pages_recursive(
+                os.path.join(dir_path_content, item),
+                template_path,
+                os.path.join(dest_dir_path, item)
+            )
