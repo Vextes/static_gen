@@ -109,7 +109,7 @@ def quote_to_node(block):
     for line in lines:
         if not line.startswith(">"):
             raise ValueError("incorrect quote block formatting")
-        quote_lines.append(line.split(' ', 1)[1])
+        quote_lines.append(line.lstrip(">").strip())
     combined_quote = " ".join(quote_lines)
     text_node_list = text_to_textnodes(combined_quote)
     child_nodes = []
