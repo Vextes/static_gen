@@ -7,7 +7,7 @@ def extract_title(markdown):
             return line.split(' ', 1)[1]
     raise Exception("No h1 header found")
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
     with open(from_path, 'r') as md_file:
@@ -18,11 +18,11 @@ def generate_page(from_path, template_path, dest_path):
 
     html_node = markdown_to_html_node(markdown_content)
     html = html_node.to_html()
-    #print(f"farthest: {html}")
 
     title = extract_title(markdown_content)
 
-    full_html = template_content.replace("{{ Title }}", title).replace("{{ Content }}", html)
+    replaced_title_content = template_content.replace("{{ Title }}", title).replace("{{ Content }}", html)
+    full_html = replaced_title_content.replace('href="/', f'href="{basepath}').replace('src="/', f'src="{basepath}')
 
     dest_dir_path = os.path.dirname(dest_path)
     if dest_dir_path != "":
@@ -31,7 +31,7 @@ def generate_page(from_path, template_path, dest_path):
     with open(dest_path, 'w') as to_file:
         to_file.write(full_html)
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
     content_list = os.listdir(dir_path_content)
     print(f"filename: {content_list}")
     for item in content_list:
@@ -42,11 +42,13 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
             generate_page(
                 os.path.join(dir_path_content, item),
                 template_path,
-                os.path.join(dest_dir_path, f"{filename}.html")
+                os.path.join(dest_dir_path, f"{filename}.html"),
+                basepath
             )
         else:
             generate_pages_recursive(
                 os.path.join(dir_path_content, item),
                 template_path,
-                os.path.join(dest_dir_path, item)
+                os.path.join(dest_dir_path, item),
+                basepath
             )
